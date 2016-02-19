@@ -130,11 +130,17 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         if let waypoint = view.annotation as? Venue {
             if let thumbnailImageView = view.leftCalloutAccessoryView as? UIImageView {
                 if let imageURLPath = waypoint.imageURL {
-                if let imageData = NSData(contentsOfURL: NSURL(string: imageURLPath)!) {
-                    if let image = UIImage(data: imageData) {
-                        thumbnailImageView.image = image
-                    }
-                }
+                    NSURLSession.sharedSession().dataTaskWithRequest(
+                        NSURLRequest(URL: NSURL (string: imageURLPath)!),
+                        completionHandler: { (data, response, error) -> Void in
+                            if let e = error {
+                                print(e)
+                            } else if let imageData = data {
+                                if let image = UIImage(data: imageData) {
+                                    thumbnailImageView.image = image
+                                }
+                            }
+                    }).resume()
                 }
             }
         }
